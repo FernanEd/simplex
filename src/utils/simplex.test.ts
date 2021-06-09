@@ -1,4 +1,11 @@
-import simplex, { faseUno, iteracion, sacarPivotes } from './simplex';
+import simplex, {
+	faseUno,
+	fixNumbers,
+	getPivots,
+	iteracion,
+	iteration,
+	sacarPivotes,
+} from './simplex';
 
 const smallMatrix = [
 	[1, 1, 0, 50, 0],
@@ -44,9 +51,11 @@ const largeMatrixBasica = [
 	[8, 6, 14],
 ];
 
-// test('simplex in the house', () => {
-// 	expect(simplex(smallMatrix, [6])).toBe(3);
-// });
+test('simplex in the house', () => {
+	expect(simplex(smallMatrix, [6], [0, 1], [-800, -600, 0, 0, 0, 0, 0])).toBe(
+		3
+	);
+});
 
 test('simplex in the house', () => {
 	expect(simplex(largeMatrix, [5, 6], [0, 1, 2], [-2, -3, -1, 0, 0, 0])).toBe(
@@ -69,7 +78,7 @@ test('simplex in the house', () => {
 
 // test('iteracion funciona', () => {
 // 	expect(
-// 		iteracion(smallMatrixBasic).map((col) =>
+// 		iteration(smallMatrixBasic).map((col) =>
 // 			col.map((value) => Number(value.toPrecision(4)))
 // 		)
 // 	).toEqual([
@@ -85,7 +94,7 @@ test('simplex in the house', () => {
 // });
 
 // test('iteracion funciona', () => {
-// 	expect(iteracion(largeMatrixBasica)).toEqual([
+// 	expect(iteration(largeMatrixBasica)).toEqual([
 // 		[0.25, 2.5, 2.5],
 // 		[1, 0, 0],
 // 		[0.5, -1, -1],
@@ -98,15 +107,23 @@ test('simplex in the house', () => {
 // });
 
 // test('sacar pivotes funciona', () => {
-// 	expect(sacarPivotes(smallMatrixBasic)).toEqual({
-// 		indiceColumnaPivote: 0,
-// 		indiceRenglonPivote: 3,
+// 	expect(getPivots(smallMatrixBasic)).toEqual({
+// 		pivotColumnIndx: 0,
+// 		pivotRowIndx: 3,
 // 	});
 // });
 
 // test('sacar pivotes funciona', () => {
-// 	expect(sacarPivotes(largeMatrixBasica)).toEqual({
-// 		indiceColumnaPivote: 1,
-// 		indiceRenglonPivote: 0,
+// 	expect(getPivots(largeMatrixBasica)).toEqual({
+// 		pivotColumnIndx: 1,
+// 		pivotRowIndx: 0,
 // 	});
+// });
+
+// test('fix numbers funciona', () => {
+// 	expect(fixNumbers(0.0000002345)).toBe(0);
+// });
+
+// test('fix numbers funciona', () => {
+// 	expect(fixNumbers(5.999999)).toBe(6);
 // });

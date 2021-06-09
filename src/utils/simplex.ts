@@ -1,5 +1,3 @@
-import { exit } from 'process';
-
 type simplexMatriz = number[][];
 
 type simplexVariableR = number[];
@@ -10,41 +8,60 @@ type simplexColumn = number[];
 
 type simplexRenglon = number[];
 
-export const sacarPivotes = (matriz: simplexMatriz) => {
-	let m = [...matriz];
-	//Ultimo renglon sin contar la columna resultados
-	const ultimoRenglon = m
-		.map((columna) => columna[columna.length - 1])
-		.slice(0, -1);
-	const indiceColumnaPivote = ultimoRenglon.indexOf(Math.max(...ultimoRenglon));
-	//Columna de resultados sin contar el renglon r
-	const columnaResultados = m[m.length - 1].slice(0, -1);
-	const columnaAux = columnaResultados.map((val, i) =>
-		columnaResultados[i] !== 0 ? val / m[indiceColumnaPivote][i] : 0
-	);
-	const indiceRenglonPivote = columnaAux.indexOf(
-		Math.min(...columnaAux.filter((val) => val >= 0))
-	);
-	return { indiceColumnaPivote, indiceRenglonPivote };
+export const fixNumbers = (n: number, precision = 6) =>
+	Number(Number(n.toFixed(precision)).toPrecision(precision));
+
+export const getLastRow = (matrix: simplexMatriz) => {
+	return matrix.map((column) => column[column.length - 1]);
 };
 
-export const iteracion = (matriz: simplexMatriz) => {
-	let m = [...matriz];
-	let { indiceColumnaPivote, indiceRenglonPivote } = sacarPivotes(matriz);
-	let interseccion = m[indiceColumnaPivote][indiceRenglonPivote];
+export const getLastColumn = (matrix: simplexMatriz) => {
+	return matrix[matrix.length - 1];
+};
 
-	let renglonPivote = m.map(
-		(columna) => columna[indiceRenglonPivote] / interseccion
+export const safeDivision = (coeficient: number, divisor: number) => {
+	if (divisor === 0) return 0;
+	else {
+		return coeficient / divisor;
+	}
+};
+
+export const getPivots = (matriz: simplexMatriz) => {
+	let m = [...matriz];
+	//Ultimo renglon sin contar la celda de resultado
+	const lastRow = getLastRow(m).slice(0, -1);
+	const pivotColumnIndx = lastRow.indexOf(Math.max(...lastRow));
+	//Columna de resultados sin contar la celda de r
+	const resultsColumn = getLastColumn(m).slice(0, -1);
+
+	const auxColumn = resultsColumn.map((val, i) =>
+		resultsColumn[i] !== 0 ? val / m[pivotColumnIndx][i] : 0
 	);
 
-	let columnaPivote = m[indiceColumnaPivote];
+	const pivotRowIndx = auxColumn.indexOf(
+		Math.min(...auxColumn.filter((val) => val >= 0))
+	);
 
-	m = m.map((columna, i) =>
-		columna.map((value, j) => {
-			if (j === indiceRenglonPivote) {
-				return renglonPivote[i];
+	return { pivotColumnIndx, pivotRowIndx };
+};
+
+export const iteration = (matrix: simplexMatriz) => {
+	let m = [...matrix];
+	let { pivotColumnIndx, pivotRowIndx } = getPivots(m);
+	let intersection = m[pivotColumnIndx][pivotRowIndx];
+
+	let pivotRow = m.map((columna) =>
+		safeDivision(columna[pivotRowIndx], intersection)
+	);
+
+	let pivotColumn = m[pivotColumnIndx];
+
+	m = m.map((column, i) =>
+		column.map((value, j) => {
+			if (j === pivotRowIndx) {
+				return pivotRow[i];
 			} else {
-				return value - columnaPivote[j] * renglonPivote[i];
+				return value - pivotColumn[j] * pivotRow[i];
 			}
 		})
 	);
@@ -65,6 +82,8 @@ export const faseUno = (
 	let m = [...matriz];
 
 	const columnasVariablesR = m.filter((_, i) => indicesVariablesR.includes(i));
+
+	[...columnasVariablesR].flat();
 
 	const indicesColumnasSumar = columnasVariablesR
 		.map((columna) => columna.indexOf(1))
@@ -90,7 +109,7 @@ export const faseUno = (
 	let iteraciones = 0;
 
 	do {
-		m2 = iteracion(m2);
+		m2 = iteration(m2);
 
 		const ultimoRenglon = m2
 			.map((columna) => columna[columna.length - 1])
@@ -147,13 +166,8 @@ const simplex = (
 		m = m.map((columna, i) =>
 			columna.map((valor, j) => {
 				if (j === columna.length - 1) {
-					return Number(
-						Number(
-							(
-								valor -
-								interseccion * columna[indiceRenglonPseudoPivote]
-							).toFixed(5)
-						).toPrecision(5)
+					return fixNumbers(
+						valor - interseccion * columna[indiceRenglonPseudoPivote]
 					);
 				} else {
 					return valor;
