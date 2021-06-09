@@ -105,24 +105,17 @@ export const faseUno = (
 	);
 
 	let m2 = m;
-	let positivosEnR;
-	let iteraciones = 0;
+	let isRPositive;
+	let iterations = 0;
 
 	do {
 		m2 = iteration(m2);
+		const lastRow = getLastRow(m2).slice(0, -1);
+		isRPositive = lastRow.some((value) => value > 0);
+		iterations++;
+	} while (isRPositive && iterations < 50);
 
-		const ultimoRenglon = m2
-			.map((columna) => columna[columna.length - 1])
-			.slice(0, -1);
-		positivosEnR = ultimoRenglon.some((value) => value > 0);
-		iteraciones++;
-
-		// console.log(m2);
-		// console.log(ultimoRenglon);
-		// console.log(positivosEnR);
-	} while (positivosEnR && iteraciones < 50);
-
-	if (iteraciones >= 50) {
+	if (iterations >= 50) {
 		throw Error(
 			`Demasiadas iteraciones, hay un problema con la matriz: ${matriz}`
 		);
@@ -137,18 +130,6 @@ const simplex = (
 	indicesVariables: simplexVariable,
 	renglonZ: simplexRenglon
 ) => {
-	//Inicia fase 2
-	// console.log(columnasVariablesR);
-	// console.log(indicesColumnasSumar);
-	// console.log(m);
-
-	// try {
-
-	// 	return m1;
-	// } catch (e) {
-	// 	console.log(e);
-	// }
-
 	const m1 = faseUno(matriz, indicesVariablesR).filter(
 		(_, i) => !indicesVariablesR.includes(i)
 	);
@@ -194,15 +175,22 @@ const simplex = (
 		// console.log(m);
 	}
 
+	// FORMA BASICA FASE 2
+
+	m;
+	let iteraciones = 0;
+	let isZPositive;
+
+	do {
+		m = iteration(m);
+		const lastRow = getLastRow(m).slice(0, -1);
+		isZPositive = lastRow.some((value) => value > 0);
+		iteraciones++;
+	} while (isZPositive && iteraciones < 50);
+
 	console.log(m);
 	// console.log(variablesX);
 	// console.log(negativosEnVariables);
 };
-
-// const obtenerUltimoRenglon = (matriz: simplexMatriz) =>
-
-// const obtenerUltimaColumna = (matriz: simplexMatriz) =>
-
-// const obtenerUltimoValor = (arreglo: number[]) =>
 
 export default simplex;
