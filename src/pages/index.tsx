@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useForm } from 'react-hook-form';
 import simplex from '../utils/simplex';
@@ -14,7 +14,7 @@ interface resultado {
 const IndexPage: React.FunctionComponent = () => {
 	const { register, handleSubmit } = useForm();
 
-	const [variables, setVariables] = useState(3);
+	const [variables, setVariables] = useState(2);
 	const [restricciones, setRestricciones] = useState(2);
 	const [resultado, setResultado] = useState<resultado>();
 
@@ -152,9 +152,41 @@ const IndexPage: React.FunctionComponent = () => {
 		setResultado(res);
 	};
 
+	// useEffect(() => {
+	// 	setInterval(() => {
+	// 		setVariables((prev) => prev + 1);
+	// 	}, 1000);
+	// }, []);
+
 	return (
 		<div>
 			<h1>Calculadora Simplex dos fases</h1>
+			{/* 
+			<label>
+				Variables{' '}
+				<input
+					type="number"
+					min="1"
+					//@ts-ignore
+					onChange={(e) => setVariables(e.currentTarget.value)}
+					value={variables}
+				/>
+			</label> */}
+
+			<button onClick={() => setVariables((prev) => prev + 1)}>
+				Agregar variable
+			</button>
+			<button onClick={() => setVariables((prev) => prev - 1)}>
+				Quitar variable
+			</button>
+
+			<button onClick={() => setRestricciones((prev) => prev + 1)}>
+				Agregar restriccion
+			</button>
+			<button onClick={() => setRestricciones((prev) => prev - 1)}>
+				Quitar restriccion
+			</button>
+
 			<form onSubmit={handleSubmit(calcular)}>
 				<div
 					css={css`
