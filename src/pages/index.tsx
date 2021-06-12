@@ -92,11 +92,11 @@ const IndexPage: React.FunctionComponent = () => {
 		let rowR: number[] = columnHeaders.map((header) =>
 			header[0] === 'r' ? -1 : 0
 		);
-		console.log(rowR);
+		// console.log(rowR);
 
 		m.push([...rowR, 0]);
 
-		console.log(m);
+		// console.log(m);
 
 		// console.log(columnHeaders);
 		// console.log(rowHeaders, columnHeaders);
@@ -154,7 +154,7 @@ const IndexPage: React.FunctionComponent = () => {
 
 	return (
 		<div>
-			hola
+			<h1>Calculadora Simplex dos fases</h1>
 			<form onSubmit={handleSubmit(calcular)}>
 				<div
 					css={css`
@@ -216,7 +216,16 @@ const IndexPage: React.FunctionComponent = () => {
 
 				<button type="submit">Resolver</button>
 			</form>
-			{resultado && JSON.stringify(resultado)}
+			{resultado ? (
+				<>
+					<h2>Resultados:</h2>{' '}
+					{Object.keys(resultado).map((key) => (
+						<div>
+							{key} : {resultado[key]}
+						</div>
+					))}
+				</>
+			) : null}
 		</div>
 	);
 };
