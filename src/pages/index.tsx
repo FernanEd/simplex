@@ -57,15 +57,18 @@ const IndexPage: React.FunctionComponent = () => {
 			}
 			// Add s
 			for (let j = 0; j < s; j++) {
-				row.push(rowHeaders[i] === columnHeaders[j + variables] ? 1 : 0);
+				let offset = variables;
+				row.push(columnHeaders[j + offset] == `s${i + 1}` ? 1 : 0);
 			}
 			// Add e
 			for (let j = 0; j < r; j++) {
-				row.push(rowHeaders[i] === columnHeaders[j + variables] ? -1 : 0);
+				let offset = variables + s;
+				row.push(columnHeaders[j + offset] == `e${i + 1}` ? -1 : 0);
 			}
-			// Fill r squares
+			// Add r
 			for (let j = 0; j < r; j++) {
-				row.push(0);
+				let offset = variables + s + r;
+				row.push(columnHeaders[j + offset] == `r${i + 1}` ? 1 : 0);
 			}
 			row.push(Number(data[`row-${i}-result`]));
 			m.push(row);
