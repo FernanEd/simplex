@@ -20,7 +20,7 @@ export const getLastColumn = (matrix: simplexMatriz) => {
 };
 
 export const safeDivision = (coeficient: number, divisor: number) => {
-	if (divisor === 0) return 0;
+	if (divisor === 0) return null;
 	else {
 		return coeficient / divisor;
 	}
@@ -67,9 +67,9 @@ const simplex = (
 		m = m.map((column, i) =>
 			column.map((value, j) => {
 				if (j === pivotRowIndx) {
-					return pivotRow[i];
+					return pivotRow[i] || 0;
 				} else {
-					return value - pivotColumn[j] * pivotRow[i];
+					return value - pivotColumn[j] * (pivotRow[i] || 0);
 				}
 			})
 		);

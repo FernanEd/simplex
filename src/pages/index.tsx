@@ -161,29 +161,22 @@ const IndexPage: React.FunctionComponent = () => {
 	return (
 		<div>
 			<h1>Calculadora Simplex dos fases</h1>
-			{/* 
-			<label>
-				Variables{' '}
-				<input
-					type="number"
-					min="1"
-					//@ts-ignore
-					onChange={(e) => setVariables(e.currentTarget.value)}
-					value={variables}
-				/>
-			</label> */}
 
 			<button onClick={() => setVariables((prev) => prev + 1)}>
 				Agregar variable
 			</button>
-			<button onClick={() => setVariables((prev) => prev - 1)}>
+			<button
+				onClick={() => setVariables((prev) => (prev > 1 ? prev - 1 : prev))}>
 				Quitar variable
 			</button>
 
 			<button onClick={() => setRestricciones((prev) => prev + 1)}>
 				Agregar restriccion
 			</button>
-			<button onClick={() => setRestricciones((prev) => prev - 1)}>
+			<button
+				onClick={() =>
+					setRestricciones((prev) => (prev > 1 ? prev - 1 : prev))
+				}>
 				Quitar restriccion
 			</button>
 
