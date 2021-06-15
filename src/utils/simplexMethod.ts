@@ -1,8 +1,18 @@
+type matrix = number[][];
+type header = string[];
+
 interface simplexParams {
-	matrix: number[][];
-	columnHeaders: string[];
-	rowHeaders: string[];
+	matrix: matrix;
+	columnHeaders: header;
+	rowHeaders: header;
 }
+
+const fixMatriz = (matrix: matrix) =>
+	matrix.map((column) =>
+		column.map((val) => Number(Number(val.toFixed(6)).toPrecision(6)))
+	);
+
+const getPivots = (matrix: matrix, search: 'min' | 'max') => {};
 
 const simplexMethod = ({
 	matrix,
@@ -18,9 +28,34 @@ const simplexMethod = ({
 		return 2;
 	}
 
-	// If is two phases, go with the first phase, then the second one
+	/*
+    TWO PHASE ALGORITM
 
-	// If is one phase, make it simple.
+    First phase: 
+    Save the z row
+    Override it with a new row where everything is 0 
+    except the r columns which are -1
+    Solve for a basic solution: find the columns where r is -1.
+    Find the rows where the column is 1
+    Then multiply the last row by those indexes
+
+    * Start iterating for the max positive number until there are no positive numbers
+
+    Second phase:
+    Cut the matrix excluding columns r
+    Override the last row with the saved z row
+    Solve for a basic solution: x column by x column
+    find the row where the column is 1: multiply the last row by those indexes
+    if the x columns in the last row are positive stop.
+    
+    * Start iterating for the max positive until there are no positive numbers
+  */
+
+	/*
+    SIMPLEX ALGORITHM
+
+    * Start iterating for the min negative until there are no negative numbers
+  */
 };
 
 export default simplexMethod;

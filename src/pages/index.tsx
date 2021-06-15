@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useForm } from 'react-hook-form';
 import simplex from '../utils/simplex';
+import Layout from '../components/Layout';
 
 interface formData {
 	[x: string]: string;
@@ -58,17 +59,22 @@ const IndexPage: React.FunctionComponent = () => {
 			// Add s
 			for (let j = 0; j < s; j++) {
 				let offset = variables;
-				row.push(columnHeaders[j + offset] == `s${i + 1}` ? 1 : 0);
+				let alignment = rowHeaders[i] === columnHeaders[j + offset];
+				row.push(alignment ? 1 : 0);
 			}
 			// Add e
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s;
-				row.push(columnHeaders[j + offset] == `e${i + 1}` ? -1 : 0);
+				let alignment =
+					rowHeaders[i] == columnHeaders[j + offset].replace('e', 'r');
+
+				row.push(alignment ? -1 : 0);
 			}
-			// Add r
+			// Fill r squares
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s + r;
-				row.push(columnHeaders[j + offset] == `r${i + 1}` ? 1 : 0);
+				let alignment = rowHeaders[i] === columnHeaders[j + offset];
+				row.push(alignment ? 1 : 0);
 			}
 			row.push(Number(data[`row-${i}-result`]));
 			m.push(row);
@@ -88,30 +94,46 @@ const IndexPage: React.FunctionComponent = () => {
 	};
 
 	return (
-		<div>
-			<h1>Calculadora Simplex dos fases</h1>
+		<Layout>
+			<h1>Calculadora Simplex</h1>
 
-			<button onClick={() => setVariables((prev) => prev + 1)}>
-				Agregar variable
-			</button>
-			<button
-				onClick={() => setVariables((prev) => (prev > 1 ? prev - 1 : prev))}>
-				Quitar variable
-			</button>
+			<section
+				css={css`
+					margin: 1rem 0;
+					display: flex;
+					gap: 1rem;
+					justify-content: center;
+					align-items: center;
+				`}>
+				<button onClick={() => setVariables((prev) => prev + 1)}>
+					Agregar variable
+				</button>
+				<button
+					onClick={() => setVariables((prev) => (prev > 1 ? prev - 1 : prev))}>
+					Quitar variable
+				</button>
 
-			<button onClick={() => setRestricciones((prev) => prev + 1)}>
-				Agregar restriccion
-			</button>
-			<button
-				onClick={() =>
-					setRestricciones((prev) => (prev > 1 ? prev - 1 : prev))
-				}>
-				Quitar restriccion
-			</button>
+				<button onClick={() => setRestricciones((prev) => prev + 1)}>
+					Agregar restriccion
+				</button>
+				<button
+					onClick={() =>
+						setRestricciones((prev) => (prev > 1 ? prev - 1 : prev))
+					}>
+					Quitar restriccion
+				</button>
+			</section>
 
-			<form onSubmit={handleSubmit(calcular)}>
+			<form
+				onSubmit={handleSubmit(calcular)}
+				css={css`
+					margin: auto;
+					display: inline-block;
+				`}>
+				<h2>Función Objetivo</h2>
 				<div
 					css={css`
+						margin: 1rem 0;
 						display: flex;
 						gap: 1rem;
 						align-items: center;
@@ -135,13 +157,18 @@ const IndexPage: React.FunctionComponent = () => {
 					))}
 				</div>
 
+				<hr />
+
+				<h2>Restricciones</h2>
 				{[...Array(restricciones)].map((_, i) => (
 					<div
 						css={css`
+							margin: 1rem 0;
 							display: flex;
 							gap: 1rem;
 							align-items: center;
 						`}>
+						<p>r{i + 1})</p>
 						{[...Array(variables)].map((_, j) => (
 							<div
 								css={css`
@@ -168,19 +195,29 @@ const IndexPage: React.FunctionComponent = () => {
 					</div>
 				))}
 
+				<hr />
+				<br />
 				<button type="submit">Resolver</button>
 			</form>
-			{resultado ? (
-				<>
-					<h2>Resultados:</h2>{' '}
-					{Object.keys(resultado).map((key) => (
-						<div>
-							{key} : {resultado[key]}
-						</div>
-					))}
-				</>
-			) : null}
-		</div>
+
+			<section
+				css={css`
+					margin: 1rem;
+				`}>
+				{resultado ? (
+					<>
+						<h2>Resultados:</h2>{' '}
+						{Object.keys(resultado).map((key) => (
+							<div>
+								{key} : {resultado[key]}
+							</div>
+						))}
+					</>
+				) : (
+					'Sin resultado aun...'
+				)}
+			</section>
+		</Layout>
 	);
 };
 
