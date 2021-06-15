@@ -26,20 +26,34 @@ export const safeDivision = (coeficient: number, divisor: number) => {
 	}
 };
 
-export const getPivots = (matriz: simplexMatriz) => {
+export const fixMatrix = (matriz: simplexMatriz) => {
+	return matriz.map((columna) => columna.map((value) => fixNumbers(value)));
+};
+
+export const getPivots = (matriz: simplexMatriz, simplexOne?: boolean) => {
 	let m = [...matriz];
 	//Ultimo renglon sin contar la celda de resultado
 	const lastRow = getLastRow(m).slice(0, -1);
-	const pivotColumnIndx = lastRow.indexOf(Math.max(...lastRow));
+
+	const pivotColumnIndx = simplexOne
+		? lastRow.indexOf(Math.min(...lastRow.filter((value) => value < 0)))
+		: lastRow.indexOf(Math.max(...lastRow));
 	//Columna de resultados sin contar la celda de r
 	const resultsColumn = getLastColumn(m).slice(0, -1);
+
+	console.log(
+		m,
+		pivotColumnIndx,
+		lastRow,
+		lastRow.filter((value) => value < 0)
+	);
 
 	const auxColumn = resultsColumn.map((val, i) =>
 		resultsColumn[i] !== 0 ? val / m[pivotColumnIndx][i] : 0
 	);
 
 	const pivotRowIndx = auxColumn.indexOf(
-		Math.min(...auxColumn.filter((val) => val >= 0))
+		Math.min(...auxColumn.filter((val) => val > 0))
 	);
 
 	return { pivotColumnIndx, pivotRowIndx };
@@ -51,11 +65,12 @@ const simplex = (
 	indicesVariables: simplexVariable,
 	renglonZ: simplexRenglon,
 	columnHeaders: string[],
-	rowHeaders: string[]
+	rowHeaders: string[],
+	skipPhase1: boolean
 ) => {
 	const iteration = (matrix: simplexMatriz) => {
 		let m = [...matrix];
-		let { pivotColumnIndx, pivotRowIndx } = getPivots(m);
+		let { pivotColumnIndx, pivotRowIndx } = getPivots(m, skipPhase1);
 		let intersection = m[pivotColumnIndx][pivotRowIndx];
 
 		let pivotRow = m.map((columna) =>
@@ -75,6 +90,8 @@ const simplex = (
 		);
 
 		rowHeaders[pivotRowIndx] = columnHeaders[pivotColumnIndx];
+
+		console.log('col', pivotColumnIndx, 'row', pivotRowIndx);
 
 		// console.log(indiceRenglonPivote);
 		// console.log(renglonPivote);
@@ -119,10 +136,12 @@ const simplex = (
 		let iterations = 0;
 
 		do {
-			m2 = iteration(m2);
+			m2 = fixMatrix(iteration(m2));
 			const lastRow = getLastRow(m2).slice(0, -1);
 			isRPositive = lastRow.some((value) => value > 0);
 			iterations++;
+
+			console.log(m2);
 		} while (isRPositive && iterations < 50);
 
 		if (iterations >= 50) {
@@ -177,6 +196,8 @@ const simplex = (
 			const lastRow = getLastRow(m2).slice(0, -1);
 			isZPositive = lastRow.some((value) => value > 0);
 			iterations++;
+
+			console.log('iteracion', m2);
 		} while (isZPositive && iterations < 50);
 
 		if (iterations >= 50) {
@@ -188,15 +209,25 @@ const simplex = (
 		return m2;
 	};
 
+	//Relative code
+
 	//Get phase two basic table (minus R vars)
-	const m1 = faseUno(matriz, indicesVariablesR).filter(
-		(_, i) => !indicesVariablesR.includes(i)
-	);
+
+	let m1;
+	if (skipPhase1) {
+		m1 = matriz;
+	} else {
+		m1 = faseUno(matriz, indicesVariablesR).filter(
+			(_, i) => !indicesVariablesR.includes(i)
+		);
+	}
 
 	//Replace r row with Z row
 	let m = m1.map((columna, i) =>
 		columna.map((value, j) => (j === columna.length - 1 ? renglonZ[i] : value))
 	);
+
+	console.log('primer matriz', m);
 
 	let m2 = phaseTwo(m, indicesVariables);
 	let results = m2[m2.length - 1];

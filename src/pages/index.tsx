@@ -19,144 +19,70 @@ const IndexPage: React.FunctionComponent = () => {
 	const [resultado, setResultado] = useState<resultado>();
 
 	const calcular = (data: formData) => {
-		// console.log(data);
+		console.log(data);
 
-		let m: number[][] = [...Array(restricciones)].map((_) => [
-			...Array(variables),
-		]);
+		// BUILDING HEADERS
+		let restrictions = [...Array(restricciones)].map(
+			(_, i) => data[`row-${i}-restriction`]
+		);
 
-		// console.log(m);
+		let s = restrictions.filter((restriction) => restriction == '<=').length;
+		let r = restrictions.filter((restriction) => restriction == '>=').length;
 
-		let restrictions: string[] = [];
+		let columnHeaders: string[] = [
+			...[...Array(variables)].map((_, i) => `x${i + 1}`),
+			...[...Array(s)].map((_, i) => `s${i + 1}`),
+			...[...Array(r)].map((_, i) => `e${i + 1}`),
+			...[...Array(r)].map((_, i) => `r${i + 1}`),
+			'res',
+		];
 
-		for (let i = 0; i < restricciones; i++) {
-			restrictions.push(data[`row-${i}-restriction`]);
+		let rowHeaders: string[] = [
+			...[...Array(s)].map((_, i) => `s${i + 1}`),
+			...[...Array(r)].map((_, i) => `r${i + 1}`),
+			'z',
+		];
 
+		console.log(columnHeaders, rowHeaders);
+
+		// BUILDING MATRIX
+
+		let m: number[][] = [];
+		for (let i = 0; i < rowHeaders.length - 1; i++) {
+			let row = [];
+
+			//Add values
 			for (let j = 0; j < variables; j++) {
-				m[i][j] = Number(data[`row-${i}-val-${j}`]);
+				row.push(Number(data[`row-${i}-val-${j}`]));
 			}
+			// Add s
+			for (let j = 0; j < s; j++) {
+				row.push(rowHeaders[i] === columnHeaders[j + variables] ? 1 : 0);
+			}
+			// Add e
+			for (let j = 0; j < r; j++) {
+				row.push(rowHeaders[i] === columnHeaders[j + variables] ? -1 : 0);
+			}
+			// Fill r squares
+			for (let j = 0; j < r; j++) {
+				row.push(0);
+			}
+			row.push(Number(data[`row-${i}-result`]));
+			m.push(row);
 		}
 
-		//Build row headers and column headers
+		// ADDING ROW Z
 
-		let rowHeaders: string[] = [];
-		let r = 0;
-		let s = 0;
+		let rowZ = [
+			...[...Array(variables)].map((_, i) => Number(data[`fn-val-${i}`]) * -1),
+			...[...Array(s)].map((_) => 0),
+			...[...Array(r)].map((_) => 0),
+			0,
+		];
 
-		for (let restriction of restrictions) {
-			if (restriction == '<=') {
-				s++;
-				rowHeaders.push(`s${s}`);
-			}
-			if (restriction == '>=') {
-				r++;
-				rowHeaders.push(`r${r}`);
-			}
-		}
-		rowHeaders.push('z');
-
-		let columnHeaders: string[] = [];
-		columnHeaders = [...Array(variables)].map((_, i) => `x${i + 1}`);
-
-		columnHeaders.push(...[...Array(s)].map((_, i) => `s${i + 1}`));
-		columnHeaders.push(...[...Array(r)].map((_, i) => `e${i + 1}`));
-		columnHeaders.push(...[...Array(r)].map((_, i) => `r${i + 1}`));
-
-		//Dinamically build the rest of the matrix
-
-		rowHeaders.slice(0, -1).forEach((rowHeader, i) => {
-			columnHeaders.slice(variables).forEach((columnHeader, j) => {
-				if (rowHeader === columnHeader) {
-					m[i].push(1);
-				} else if (
-					rowHeader[0] == 'r' &&
-					columnHeader[0] == 'e' &&
-					rowHeader[1] == columnHeader[1]
-				) {
-					m[i].push(-1);
-				} else {
-					m[i].push(0);
-				}
-			});
-
-			//Then add result
-			m[i].push(Number(data[`row-${i}-result`]));
-		});
-
-		// console.log(rowHeaders.slice(0, -1), columnHeaders.slice(variables));
-
-		// console.log(m);
-
-		// Finally add row R
-
-		let rowR: number[] = columnHeaders.map((header) =>
-			header[0] === 'r' ? -1 : 0
-		);
-		// console.log(rowR);
-
-		m.push([...rowR, 0]);
-
-		// console.log(m);
-
-		// console.log(columnHeaders);
-		// console.log(rowHeaders, columnHeaders);
-
-		// At this point the matrix generation is ok
-
-		// NOW THIS IS STUPID BUT I WILL ROTATE THE MATRIX, I ALREAD DID THE CODE THAT WAY
-
-		let newMatrix: number[][] = [];
-
-		for (let i = 0; i < m[0].length; i++) {
-			let subArr: number[] = [];
-			for (let j = 0; j < m.length; j++) {
-				subArr.push(m[j][i]);
-			}
-			newMatrix.push(subArr);
-		}
-
-		let rowZ = [...Array(variables)].map(
-			(_, i) => Number(data[`fn-val-${i}`]) * -1
-		);
-
-		rowZ.push(...[...Array(s)].map((_) => 0));
-		//The quantity of e
-		rowZ.push(...[...Array(r)].map((_) => 0));
-		//Res column
-		rowZ.push(0);
-
-		let RvarsIndxs = [];
-		for (let i = columnHeaders.length - r; i < columnHeaders.length; i++) {
-			RvarsIndxs.push(i);
-		}
-
-		let varsIndxs = [...Array(variables)].map((_, i) => i);
-
-		// the recipe is complete, incredibly unreadable and stupid code, if it works I wont move anything of it
-
-		let res = simplex(
-			newMatrix,
-			RvarsIndxs,
-			varsIndxs,
-			rowZ,
-			columnHeaders,
-			rowHeaders
-		);
-
-		for (let header of columnHeaders) {
-			if (!(header in res)) {
-				res[header] = 0;
-			}
-		}
-
-		setResultado(res);
+		m.push(rowZ);
+		console.log(m);
 	};
-
-	// useEffect(() => {
-	// 	setInterval(() => {
-	// 		setVariables((prev) => prev + 1);
-	// 	}, 1000);
-	// }, []);
 
 	return (
 		<div>
