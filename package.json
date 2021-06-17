@@ -14,7 +14,7 @@
 		"serve": "gatsby serve",
 		"clean": "gatsby clean",
 		"test": "jest src/utils/simplexMethod.test.ts --watch",
-		"test2": "jest src/utils/simplexclass.test.ts --watch"
+		"test2": "jest src/utils/simplex.test.ts --watch"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.4.0",
