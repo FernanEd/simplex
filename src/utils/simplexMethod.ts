@@ -9,10 +9,11 @@ interface simplexParams {
 	fnZ: fnZ;
 }
 
+export const fixNumber = (number: number) =>
+	Number(Number(number.toFixed(6)).toPrecision(6));
+
 export const fixMatrix = (matrix: matrix) =>
-	matrix.map((column) =>
-		column.map((val) => Number(Number(val.toFixed(6)).toPrecision(6)))
-	);
+	matrix.map((column) => column.map((val) => fixNumber(val)));
 
 export const getColumn = (matriz: matrix, columnIndex: number) => {
 	return matriz.map((row) => row[columnIndex]);
@@ -47,13 +48,14 @@ export const getPivots = (matrix: matrix, fnZ: fnZ) => {
 	let pivotColumn = getColumn(m, columnPivotIndex).slice(0, -1);
 	let auxColumn = resultColumn.map((result, i) => result / pivotColumn[i]);
 
+	//Filter values where number is divided by 0 or number is -0
 	let rowPivotIndex = auxColumn.indexOf(
-		Math.min(...auxColumn.filter((val) => val >= 0 && val != Infinity))
+		Math.min(
+			...auxColumn.filter(
+				(val) => val >= 0 && val != Infinity && !Object.is(val, -0)
+			)
+		)
 	);
-
-	// console.log(m);
-	// console.log(resultColumn, pivotColumn, auxColumn);
-	// console.log(rowPivotIndex, columnPivotIndex);
 
 	return {
 		columnPivotIndex,
@@ -91,6 +93,15 @@ export const iteration = (
 	return fixMatrix(m);
 };
 
+const giveResults = (resultsColumn: number[], headers: header) => {
+	let results: { [x: string]: number } = {};
+
+	headers.forEach((header, i) => {
+		results[header] = Math.round(fixNumber(resultsColumn[i])) || 0;
+	});
+	return results;
+};
+
 const simplexMethod = ({
 	matrix,
 	columnHeaders,
@@ -105,15 +116,14 @@ const simplexMethod = ({
 	} else {
 		let iterationLimit = 50;
 		let negativesLastRow;
-		let negativesLastColumn;
 		let iterations = 0;
 
 		do {
 			m = iteration(m, 'max', columnHeaders, rowHeaders);
 			//Get last row but cut out the result column
 			let lastRow = m[m.length - 1].slice(0, -1);
-			let lastColumn = getColumn(m, m[0].length - 1).slice(0, -1);
-			negativesLastColumn = lastColumn.some((val) => val < 0);
+			negativesLastRow = lastRow.some((val) => val < 0);
+			// console.log(m);
 			iterations++;
 		} while (negativesLastRow && iterations < iterationLimit);
 
@@ -123,9 +133,8 @@ const simplexMethod = ({
 			);
 		}
 
-		console.log(getColumn(m, m[0].length - 1), rowHeaders);
-
-		return 2;
+		let resultColumn = getColumn(m, m[0].length - 1);
+		return giveResults(resultColumn, rowHeaders);
 	}
 
 	/*

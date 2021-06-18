@@ -52,13 +52,23 @@ const m4 = {
 	fnZ: 'max',
 };
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m1)).toBe(2);
-// });
+test('Simplex for MaxZ & no Rs works', () => {
+	expect(simplexMethod(m1)).toEqual({
+		s2: 750,
+		x1: 3750,
+		x2: 1250,
+		z: 162500,
+	});
+});
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m2)).toEqual(2);
-// });
+test('Simplex for MaxZ & no Rs works', () => {
+	expect(simplexMethod(m2)).toEqual({
+		s2: 250,
+		x1: 150,
+		x2: 100,
+		z: 1675,
+	});
+});
 
 // test('Simplex for MaxZ & no Rs works', () => {
 // 	expect(simplexMethod(m3)).toBe(1);
