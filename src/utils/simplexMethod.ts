@@ -18,13 +18,6 @@ export const getColumn = (matriz: matrix, columnIndex: number) => {
 	return matriz.map((row) => row[columnIndex]);
 };
 
-export const safeDivision = (coeficient: number, divisor: number) => {
-	if (divisor === 0) return 0;
-	else {
-		return coeficient / divisor;
-	}
-};
-
 export const copyArray = (matrix: matrix) => {
 	let m = [];
 	for (let i = 0; i < matrix.length; i++) {
@@ -49,15 +42,18 @@ export const getPivots = (matrix: matrix, fnZ: fnZ) => {
 	);
 
 	//Then divide result column by pivot column and get the row index of the lower positive
-	let resultColumn = getColumn(m, m[0].length - 1);
-	let pivotColumn = getColumn(m, columnPivotIndex);
-	let auxColumn = resultColumn.map((result, i) =>
-		safeDivision(result, pivotColumn[i])
-	);
+	//Minus the result row
+	let resultColumn = getColumn(m, m[0].length - 1).slice(0, -1);
+	let pivotColumn = getColumn(m, columnPivotIndex).slice(0, -1);
+	let auxColumn = resultColumn.map((result, i) => result / pivotColumn[i]);
 
 	let rowPivotIndex = auxColumn.indexOf(
-		Math.min(...auxColumn.filter((val) => val > 0))
+		Math.min(...auxColumn.filter((val) => val >= 0 && val != Infinity))
 	);
+
+	// console.log(m);
+	// console.log(resultColumn, pivotColumn, auxColumn);
+	// console.log(rowPivotIndex, columnPivotIndex);
 
 	return {
 		columnPivotIndex,
@@ -65,14 +61,18 @@ export const getPivots = (matrix: matrix, fnZ: fnZ) => {
 	};
 };
 
-export const iteration = (matrix: matrix, fnZ: fnZ) => {
+//Iteration has side-effects.
+export const iteration = (
+	matrix: matrix,
+	fnZ: fnZ,
+	columnHeaders: header,
+	rowHeaders: header
+) => {
 	let m = copyArray(matrix);
 	let { columnPivotIndex, rowPivotIndex } = getPivots(m, fnZ);
 	let intersectionCoeficient = m[rowPivotIndex][columnPivotIndex];
 
-	let pivotRow = m[rowPivotIndex].map((val) =>
-		safeDivision(val, intersectionCoeficient)
-	);
+	let pivotRow = m[rowPivotIndex].map((val) => val / intersectionCoeficient);
 
 	// Make a new matrix, when the row is the pivot row, substitute with pivotRow
 	// When not, get the value minus the pivot coeficient multiplied by the respective pivot row of the current column
@@ -84,6 +84,9 @@ export const iteration = (matrix: matrix, fnZ: fnZ) => {
 					: matrix[row][col] - matrix[row][columnPivotIndex] * pivotRow[col];
 		}
 	}
+
+	//Change headers
+	rowHeaders[rowPivotIndex] = columnHeaders[columnPivotIndex];
 
 	return fixMatrix(m);
 };
@@ -100,6 +103,28 @@ const simplexMethod = ({
 	if (twoPhases) {
 		return 1;
 	} else {
+		let iterationLimit = 50;
+		let negativesLastRow;
+		let negativesLastColumn;
+		let iterations = 0;
+
+		do {
+			m = iteration(m, 'max', columnHeaders, rowHeaders);
+			//Get last row but cut out the result column
+			let lastRow = m[m.length - 1].slice(0, -1);
+			let lastColumn = getColumn(m, m[0].length - 1).slice(0, -1);
+			negativesLastColumn = lastColumn.some((val) => val < 0);
+			iterations++;
+		} while (negativesLastRow && iterations < iterationLimit);
+
+		if (iterations >= iterationLimit) {
+			throw Error(
+				`Demasiadas iteraciones, hay un problema con la matriz: ${matrix}`
+			);
+		}
+
+		console.log(getColumn(m, m[0].length - 1), rowHeaders);
+
 		return 2;
 	}
 
