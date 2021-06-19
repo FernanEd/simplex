@@ -1,6 +1,6 @@
 type matrix = number[][];
 type header = string[];
-type fnZ = 'min' | 'max';
+type fnZ = string;
 
 interface simplexParams {
 	matrix: matrix;
@@ -112,7 +112,7 @@ const simplexMethod = ({
 	let m = copyArray(matrix);
 
 	if (twoPhases) {
-		return 1;
+		return { a: 1 };
 	} else {
 		let iterationLimit = 50;
 		let negativesLastRow;

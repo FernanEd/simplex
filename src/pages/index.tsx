@@ -3,6 +3,7 @@ import { css } from '@emotion/react';
 import { useForm } from 'react-hook-form';
 import simplex from '../utils/simplex';
 import Layout from '../components/Layout';
+import simplexMethod from '../utils/simplexMethod';
 
 interface formData {
 	[x: string]: string;
@@ -43,8 +44,6 @@ const IndexPage: React.FunctionComponent = () => {
 			...[...Array(r)].map((_, i) => `r${i + 1}`),
 			'z',
 		];
-
-		console.log(columnHeaders, rowHeaders);
 
 		// BUILDING MATRIX
 
@@ -90,7 +89,17 @@ const IndexPage: React.FunctionComponent = () => {
 		];
 
 		m.push(rowZ);
-		console.log(m);
+
+		let result = simplexMethod({
+			matrix: m,
+			columnHeaders,
+			rowHeaders,
+			fnZ: data['fn-type'] || 'max',
+		});
+
+		console.log(result);
+
+		setResultado(result);
 	};
 
 	return (
