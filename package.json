@@ -23,6 +23,7 @@
 		"@emotion/styled": "^11.3.0",
 		"gatsby": "^3.6.2",
 		"gatsby-plugin-emotion": "^6.7.0",
+		"gatsby-plugin-google-fonts": "^1.0.1",
 		"gatsby-plugin-image": "^1.7.0",
 		"gatsby-plugin-react-helmet": "^4.7.0",
 		"gatsby-plugin-sharp": "^3.7.0",
@@ -38,6 +39,7 @@
 		"@babel/preset-env": "^7.14.4",
 		"@babel/preset-typescript": "^7.13.0",
 		"@types/jest": "^26.0.23",
+		"@types/react-helmet": "^6.1.1",
 		"babel-jest": "^27.0.2",
 		"gh-pages": "^3.2.2",
 		"jest": "^27.0.4"

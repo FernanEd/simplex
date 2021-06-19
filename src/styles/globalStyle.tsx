@@ -11,7 +11,7 @@ const styles = css`
 	* {
 		margin: 0;
 		box-sizing: border-box;
-		font-family: 'monospace';
+		font-family: 'Roboto mono', monospace;
 	}
 
 	html,

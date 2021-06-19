@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { css } from '@emotion/react';
 import { useForm } from 'react-hook-form';
-import simplex from '../utils/simplex';
 import Layout from '../components/Layout';
 import simplexMethod from '../utils/simplexMethod';
+
+import { Helmet } from 'react-helmet';
 
 interface formData {
 	[x: string]: string;
@@ -117,6 +118,7 @@ const IndexPage: React.FunctionComponent = () => {
 
 	return (
 		<Layout>
+			<Helmet title="Calculadora Simplex" />
 			<h1>Calculadora Simplex</h1>
 
 			<section
