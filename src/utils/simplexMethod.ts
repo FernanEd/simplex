@@ -166,6 +166,9 @@ const simplexMethod = ({
 			.map((header) => columnHeaders.indexOf(header));
 
 		for (let varIndex of varsIndexes) {
+			if (getColumn(m, varIndex).filter((val) => val == 1).length > 1) {
+				continue;
+			}
 			let rowIndx = getColumn(m, varIndex).indexOf(1);
 			let lastRow = m2[m2.length - 1];
 			let pivot = lastRow[varIndex] * -1;
@@ -181,8 +184,6 @@ const simplexMethod = ({
 
 			if (!negativeVars) break;
 		}
-
-		console.log(m2, varsIndexes);
 
 		let iterationLimit2 = 50;
 		let checkLastRow;

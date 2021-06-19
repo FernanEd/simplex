@@ -77,51 +77,51 @@ const m6 = {
 	fnZ: 'min',
 };
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m1)).toEqual({
-// 		s2: 750,
-// 		x1: 3750,
-// 		x2: 1250,
-// 		z: 162500,
-// 	});
-// });
+test('Simplex for MaxZ & no Rs works', () => {
+	expect(simplexMethod(m1)).toEqual({
+		s2: 750,
+		x1: 3750,
+		x2: 1250,
+		z: 162500,
+	});
+});
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m2)).toEqual({
-// 		s2: 250,
-// 		x1: 150,
-// 		x2: 100,
-// 		z: 1675,
-// 	});
-// });
+test('Simplex for MaxZ & no Rs works', () => {
+	expect(simplexMethod(m2)).toEqual({
+		s2: 250,
+		x1: 150,
+		x2: 100,
+		z: 1675,
+	});
+});
 
-// test('Simplex for MinZ with Rs works', () => {
-// 	expect(simplexMethod(m3)).toEqual({
-// 		x2: 1.8,
-// 		x1: 0.8,
-// 		z: 7,
-// 	});
-// });
+test('Simplex for MinZ with Rs works', () => {
+	expect(simplexMethod(m3)).toEqual({
+		x2: 1.8,
+		x1: 0.8,
+		z: 7,
+	});
+});
 
-// test('Simplex for MinZ with Rs works', () => {
-// 	expect(simplexMethod(m4)).toEqual({
-// 		x1: 4,
-// 		x2: 5,
-// 		s2: 6,
-// 		s3: 3,
-// 		z: 6200,
-// 	});
-// });
+test('Simplex for MinZ with Rs works', () => {
+	expect(simplexMethod(m4)).toEqual({
+		x1: 4,
+		x2: 5,
+		s2: 6,
+		s3: 3,
+		z: 6200,
+	});
+});
 
-// test('Simplex for MinZ with Rs works', () => {
-// 	expect(simplexMethod(m5)).toEqual({
-// 		x1: 130000,
-// 		x2: 80000,
-// 		e1: 20000,
-// 		s3: 30000,
-// 		z: 19400,
-// 	});
-// });
+test('Simplex for MinZ with Rs works', () => {
+	expect(simplexMethod(m5)).toEqual({
+		x1: 130000,
+		x2: 80000,
+		e1: 20000,
+		s3: 30000,
+		z: 19400,
+	});
+});
 
 test('Simplex for MinZ with Rs works', () => {
 	expect(simplexMethod(m6)).toEqual({
