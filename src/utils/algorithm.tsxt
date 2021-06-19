@@ -1,0 +1,32 @@
+
+	/*
+    TWO PHASE ALGORITM
+
+    First phase: 
+    Save the z row
+    Override it with a new r row where everything is 0 
+    except the r columns which are -1
+    Solve for a basic solution: find the columns where r is -1.
+    Find the rows where the column is 1
+    Then multiply the last row by those indexes
+
+    * Start iterating for the max positive number until there are no positive numbers
+
+    Second phase:
+    Copy the matrix from the first phase excluding columns r
+    Override the last row with the saved z row
+    Solve for a basic solution: x column by x column
+    find the row where the column is 1: multiply the last row by those indexes
+    if the x columns in the last row are positive stop.
+    
+    if minZ
+    * Start iterating for the max positive until there are no positive numbers
+    if maxZ
+    * Start iterating for the max positive until there are no negative numbers
+
+  */
+
+	/*
+    SIMPLEX ALGORITHM
+    * Start iterating for the max positive until there are no negative numbers
+  */

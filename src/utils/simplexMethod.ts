@@ -97,7 +97,8 @@ const giveResults = (resultsColumn: number[], headers: header) => {
 	let results: { [x: string]: number } = {};
 
 	headers.forEach((header, i) => {
-		results[header] = Math.round(fixNumber(resultsColumn[i])) || 0;
+		results[header] =
+			fixNumber(Math.round(fixNumber(resultsColumn[i]) * 10) / 10) || 0;
 	});
 	return results;
 };
@@ -112,20 +113,110 @@ const simplexMethod = ({
 	let m = copyArray(matrix);
 
 	if (twoPhases) {
-		return { a: 1 };
+		//	FIRST PHASE
+
+		//Save rowZ
+		let rowZ = m[m.length - 1];
+		//Replace with r row
+		let rowR = columnHeaders.map((header) => (/r\d+/.test(header) ? -1 : 0));
+		m[m.length - 1] = rowR;
+
+		let columnRIndexes = columnHeaders
+			.filter((header, i) => /r\d+/.test(header))
+			.map((header) => columnHeaders.indexOf(header));
+
+		let rowRIndexes = columnRIndexes.map((i) => getColumn(m, i).indexOf(1));
+		let lastRow = rowR;
+
+		for (let rowRIndex of rowRIndexes) {
+			let row = m[rowRIndex];
+			for (let i = 0; i < row.length; i++) lastRow[i] += row[i];
+		}
+
+		let iterationLimit = 50;
+		let positiveLastRow;
+		let iterations = 0;
+
+		do {
+			m = iteration(m, 'min', columnHeaders, rowHeaders);
+			//Get last row but cut out the result column
+			let lastRow = m[m.length - 1].slice(0, -1);
+			positiveLastRow = lastRow.some((val) => val > 0);
+			// console.log(m);
+			iterations++;
+		} while (positiveLastRow && iterations < iterationLimit);
+
+		if (iterations >= iterationLimit) {
+			throw Error(
+				`Demasiadas iteraciones, hay un problema con la matriz: ${matrix}`
+			);
+		}
+
+		// SECOND PHASE
+
+		let m2 = m.map((column) =>
+			column.filter((_, i) => !columnRIndexes.includes(i))
+		);
+
+		m2[m2.length - 1] = m2[0].map((_, i) => rowZ[i]);
+
+		let varsIndexes = columnHeaders
+			.filter((header, i) => /x\d+/.test(header))
+			.map((header) => columnHeaders.indexOf(header));
+
+		for (let varIndex of varsIndexes) {
+			let rowIndx = getColumn(m, varIndex).indexOf(1);
+			let lastRow = m2[m2.length - 1];
+			let pivot = lastRow[varIndex] * -1;
+
+			m2[m2.length - 1] = lastRow.map((val, i) =>
+				fixNumber(val + pivot * m2[rowIndx][i])
+			);
+
+			let negativeVars = m2[m2.length - 1]
+				.slice(Math.min(...varsIndexes), Math.max(...varsIndexes))
+				.some((val) => val < 0);
+
+			if (!negativeVars) break;
+		}
+
+		let iterationLimit2 = 50;
+		let positiveLastRow2;
+		let iterations2 = 0;
+
+		// Iteration may be optional
+		if (m2[m2.length - 1].slice(0, -1).some((val) => val > 0)) {
+			do {
+				m2 = iteration(m2, 'min', columnHeaders, rowHeaders);
+				//Get last row but cut out the result column
+				let lastRow = m2[m2.length - 1].slice(0, -1);
+				positiveLastRow2 = lastRow.some((val) => val > 0);
+				// console.log(m);
+				iterations2++;
+			} while (positiveLastRow2 && iterations2 < iterationLimit2);
+
+			if (iterations2 >= iterationLimit2) {
+				throw Error(
+					`Demasiadas iteraciones, hay un problema con la matriz: ${matrix}`
+				);
+			}
+		}
+
+		let resultColumn = getColumn(m2, m2[0].length - 1);
+		return giveResults(resultColumn, rowHeaders);
 	} else {
 		let iterationLimit = 50;
-		let negativesLastRow;
+		let negativeLastRow;
 		let iterations = 0;
 
 		do {
 			m = iteration(m, 'max', columnHeaders, rowHeaders);
 			//Get last row but cut out the result column
 			let lastRow = m[m.length - 1].slice(0, -1);
-			negativesLastRow = lastRow.some((val) => val < 0);
+			negativeLastRow = lastRow.some((val) => val < 0);
 			// console.log(m);
 			iterations++;
-		} while (negativesLastRow && iterations < iterationLimit);
+		} while (negativeLastRow && iterations < iterationLimit);
 
 		if (iterations >= iterationLimit) {
 			throw Error(
@@ -136,38 +227,6 @@ const simplexMethod = ({
 		let resultColumn = getColumn(m, m[0].length - 1);
 		return giveResults(resultColumn, rowHeaders);
 	}
-
-	/*
-    TWO PHASE ALGORITM
-
-    First phase: 
-    Save the z row
-    Override it with a new r row where everything is 0 
-    except the r columns which are -1
-    Solve for a basic solution: find the columns where r is -1.
-    Find the rows where the column is 1
-    Then multiply the last row by those indexes
-
-    * Start iterating for the max positive number until there are no positive numbers
-
-    Second phase:
-    Copy the matrix from the first phase excluding columns r
-    Override the last row with the saved z row
-    Solve for a basic solution: x column by x column
-    find the row where the column is 1: multiply the last row by those indexes
-    if the x columns in the last row are positive stop.
-    
-    if minZ
-    * Start iterating for the max positive until there are no positive numbers
-    if maxZ
-    * Start iterating for the max positive until there are no negative numbers
-
-  */
-
-	/*
-    SIMPLEX ALGORITHM
-    * Start iterating for the max positive until there are no negative numbers
-  */
 };
 
 export default simplexMethod;

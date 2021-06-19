@@ -71,12 +71,22 @@ test('Simplex for MaxZ & no Rs works', () => {
 });
 
 // test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m3)).toBe(1);
+// 	expect(simplexMethod(m3)).toEqual({
+// 		x2: 1.8,
+// 		x1: 0.8,
+// 		z: 7,
+// 	});
 // });
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m4)).toBe(1);
-// });
+test('Simplex for MaxZ & no Rs works', () => {
+	expect(simplexMethod(m4)).toEqual({
+		x1: 4,
+		x2: 5,
+		s2: 6,
+		s3: 3,
+		z: 6200,
+	});
+});
 
 test('iteration works 1', () => {
 	expect(iteration(m1.matrix, 'max', m1.columnHeaders, m1.rowHeaders)).toEqual([
