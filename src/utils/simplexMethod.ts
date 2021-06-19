@@ -158,6 +158,7 @@ const simplexMethod = ({
 			column.filter((_, i) => !columnRIndexes.includes(i))
 		);
 
+		//Override lastrow with rowZ
 		m2[m2.length - 1] = m2[0].map((_, i) => rowZ[i]);
 
 		let varsIndexes = columnHeaders
@@ -165,9 +166,6 @@ const simplexMethod = ({
 			.map((header) => columnHeaders.indexOf(header));
 
 		for (let varIndex of varsIndexes) {
-			if (getColumn(m, varIndex).filter((val) => val == 1).length > 1) {
-				continue;
-			}
 			let rowIndx = getColumn(m, varIndex).indexOf(1);
 			let lastRow = m2[m2.length - 1];
 			let pivot = lastRow[varIndex] * -1;
@@ -176,12 +174,15 @@ const simplexMethod = ({
 				fixNumber(val + pivot * m2[rowIndx][i])
 			);
 
+			//Negative vars not working properly
 			let negativeVars = m2[m2.length - 1]
-				.slice(Math.min(...varsIndexes), Math.max(...varsIndexes))
+				.filter((_, i) => varsIndexes.includes(i))
 				.some((val) => val < 0);
 
 			if (!negativeVars) break;
 		}
+
+		console.log(m2, varsIndexes);
 
 		let iterationLimit2 = 50;
 		let checkLastRow;
