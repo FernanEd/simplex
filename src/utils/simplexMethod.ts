@@ -162,10 +162,7 @@ const simplexMethod = ({
 
 		let varsIndexes = columnHeaders
 			.filter((header, i) => /x\d+/.test(header))
-			.map((header) => columnHeaders.indexOf(header))
-			.sort((a, b) => (a < b ? 1 : -1));
-
-		console.log(varsIndexes);
+			.map((header) => columnHeaders.indexOf(header));
 
 		for (let varIndex of varsIndexes) {
 			if (getColumn(m, varIndex).filter((val) => val == 1).length > 1) {
@@ -178,10 +175,6 @@ const simplexMethod = ({
 			m2[m2.length - 1] = lastRow.map((val, i) =>
 				fixNumber(val + pivot * m2[rowIndx][i])
 			);
-
-			// NEEDED TO CHECK P1, LARRAGA, SOLUCION BASICA 2
-			// WHEN TO CHECK THE COLUMN
-			console.log(m2);
 
 			let negativeVars = m2[m2.length - 1]
 				.slice(Math.min(...varsIndexes), Math.max(...varsIndexes))
@@ -207,7 +200,6 @@ const simplexMethod = ({
 				checkLastRow = lastRow.some((val) =>
 					fnZ == 'min' ? val > 0 : val < 0
 				);
-				console.log(m2[m2.length - 1], fnZ, checkLastRow);
 				iterations2++;
 			} while (checkLastRow && iterations2 < iterationLimit2);
 
