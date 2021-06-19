@@ -42,6 +42,7 @@ const IndexPage: React.FunctionComponent = () => {
 				rowHeaders.push(`r${r}`);
 			}
 		}
+		rowHeaders.push('z');
 
 		let columnHeaders: string[] = [
 			...[...Array(variables)].map((_, i) => `x${i + 1}`),
