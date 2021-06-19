@@ -36,7 +36,7 @@ const m3 = {
 	],
 	columnHeaders: ['x1', 'x2', 'x3', 'e1', 'e2', 'r1', 'r2', 'res'],
 	rowHeaders: ['r1', 'r2', 'z'],
-	fnZ: 'max',
+	fnZ: 'min',
 };
 
 const m4 = {
@@ -49,42 +49,65 @@ const m4 = {
 	],
 	columnHeaders: ['x1', 'x2', 's1', 's2', 's3', 'e1', 'r1', 'res'],
 	rowHeaders: ['s1', 's2', 's3', 'r1', 'z'],
+	fnZ: 'min',
+};
+
+const m5 = {
+	matrix: [
+		[1, 1, 1, 0, 0, 0, 0, 210000],
+		[1, 0, 0, 1, 0, 0, 0, 130000],
+		[1, -2, 0, 0, 1, 0, 0, 0],
+		[0, 1, 0, 0, 0, -1, 1, 60000],
+		[-0.1, -0.08, 0, 0, 0, 0, 0, 0],
+	],
+	columnHeaders: ['x1', 'x2', 's1', 's2', 's3', 'e1', 'r1', 'res'],
+	rowHeaders: ['s1', 's2', 's3', 'r1', 'z'],
 	fnZ: 'max',
 };
 
-test('Simplex for MaxZ & no Rs works', () => {
-	expect(simplexMethod(m1)).toEqual({
-		s2: 750,
-		x1: 3750,
-		x2: 1250,
-		z: 162500,
-	});
-});
+// test('Simplex for MaxZ & no Rs works', () => {
+// 	expect(simplexMethod(m1)).toEqual({
+// 		s2: 750,
+// 		x1: 3750,
+// 		x2: 1250,
+// 		z: 162500,
+// 	});
+// });
 
-test('Simplex for MaxZ & no Rs works', () => {
-	expect(simplexMethod(m2)).toEqual({
-		s2: 250,
-		x1: 150,
-		x2: 100,
-		z: 1675,
-	});
-});
+// test('Simplex for MaxZ & no Rs works', () => {
+// 	expect(simplexMethod(m2)).toEqual({
+// 		s2: 250,
+// 		x1: 150,
+// 		x2: 100,
+// 		z: 1675,
+// 	});
+// });
+
+// test('Simplex for MinZ with Rs works', () => {
+// 	expect(simplexMethod(m3)).toEqual({
+// 		x2: 1.8,
+// 		x1: 0.8,
+// 		z: 7,
+// 	});
+// });
+
+// test('Simplex for MinZ with Rs works', () => {
+// 	expect(simplexMethod(m4)).toEqual({
+// 		x1: 4,
+// 		x2: 5,
+// 		s2: 6,
+// 		s3: 3,
+// 		z: 6200,
+// 	});
+// });
 
 test('Simplex for MinZ with Rs works', () => {
-	expect(simplexMethod(m3)).toEqual({
-		x2: 1.8,
-		x1: 0.8,
-		z: 7,
-	});
-});
-
-test('Simplex for MinZ with Rs works', () => {
-	expect(simplexMethod(m4)).toEqual({
-		x1: 4,
-		x2: 5,
-		s2: 6,
-		s3: 3,
-		z: 6200,
+	expect(simplexMethod(m5)).toEqual({
+		x1: 130000,
+		x2: 80000,
+		e1: 20000,
+		s3: 30000,
+		z: 19400,
 	});
 });
 
