@@ -28,8 +28,20 @@ const IndexPage: React.FunctionComponent = () => {
 			(_, i) => data[`row-${i}-restriction`]
 		);
 
-		let s = restrictions.filter((restriction) => restriction == '<=').length;
-		let r = restrictions.filter((restriction) => restriction == '>=').length;
+		let s = 0;
+		let r = 0;
+
+		let rowHeaders: string[] = [];
+
+		for (let restriction of restrictions) {
+			if (restriction == '<=') {
+				s++;
+				rowHeaders.push(`s${s}`);
+			} else {
+				r++;
+				rowHeaders.push(`r${r}`);
+			}
+		}
 
 		let columnHeaders: string[] = [
 			...[...Array(variables)].map((_, i) => `x${i + 1}`),
@@ -39,18 +51,12 @@ const IndexPage: React.FunctionComponent = () => {
 			'res',
 		];
 
-		let rowHeaders: string[] = [
-			...[...Array(s)].map((_, i) => `s${i + 1}`),
-			...[...Array(r)].map((_, i) => `r${i + 1}`),
-			'z',
-		];
-
 		// BUILDING MATRIX
 
 		let m: number[][] = [];
 		for (let i = 0; i < rowHeaders.length - 1; i++) {
 			let row = [];
-
+			console.log('row', i + 1);
 			//Add values
 			for (let j = 0; j < variables; j++) {
 				row.push(Number(data[`row-${i}-val-${j}`]));
@@ -61,6 +67,7 @@ const IndexPage: React.FunctionComponent = () => {
 				let alignment = rowHeaders[i] === columnHeaders[j + offset];
 				row.push(alignment ? 1 : 0);
 			}
+			console.log(row);
 			// Add e
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s;
@@ -69,6 +76,7 @@ const IndexPage: React.FunctionComponent = () => {
 
 				row.push(alignment ? -1 : 0);
 			}
+			console.log(row);
 			// Fill r squares
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s + r;
@@ -76,6 +84,7 @@ const IndexPage: React.FunctionComponent = () => {
 				row.push(alignment ? 1 : 0);
 			}
 			row.push(Number(data[`row-${i}-result`]));
+			console.log(row);
 			m.push(row);
 		}
 
@@ -90,11 +99,14 @@ const IndexPage: React.FunctionComponent = () => {
 
 		m.push(rowZ);
 
+		console.log(m, data['fn-type']);
+		console.log(m, columnHeaders, rowHeaders);
+
 		let result = simplexMethod({
 			matrix: m,
 			columnHeaders,
 			rowHeaders,
-			fnZ: data['fn-type'] || 'max',
+			fnZ: data['fn-type'],
 		});
 
 		console.log(result);
