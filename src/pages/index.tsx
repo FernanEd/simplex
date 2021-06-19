@@ -157,7 +157,8 @@ const IndexPage: React.FunctionComponent = () => {
 							css={css`
 								display: flex;
 								align-items: center;
-							`}>
+							`}
+							key={i}>
 							<p>+</p>
 							<label>
 								<input type="text" {...register(`fn-val-${i}`)} />x{i + 1}
@@ -176,14 +177,16 @@ const IndexPage: React.FunctionComponent = () => {
 							display: flex;
 							gap: 1rem;
 							align-items: center;
-						`}>
+						`}
+						key={i}>
 						<p>r{i + 1})</p>
 						{[...Array(variables)].map((_, j) => (
 							<div
 								css={css`
 									display: flex;
 									align-items: center;
-								`}>
+								`}
+								key={`${i}-${j}`}>
 								<p>+</p>
 								<label>
 									<input type="text" {...register(`row-${i}-val-${j}`)} />x

@@ -70,15 +70,15 @@ test('Simplex for MaxZ & no Rs works', () => {
 	});
 });
 
-// test('Simplex for MaxZ & no Rs works', () => {
-// 	expect(simplexMethod(m3)).toEqual({
-// 		x2: 1.8,
-// 		x1: 0.8,
-// 		z: 7,
-// 	});
-// });
+test('Simplex for MinZ with Rs works', () => {
+	expect(simplexMethod(m3)).toEqual({
+		x2: 1.8,
+		x1: 0.8,
+		z: 7,
+	});
+});
 
-test('Simplex for MaxZ & no Rs works', () => {
+test('Simplex for MinZ with Rs works', () => {
 	expect(simplexMethod(m4)).toEqual({
 		x1: 4,
 		x2: 5,
