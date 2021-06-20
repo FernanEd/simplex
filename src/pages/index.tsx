@@ -20,6 +20,7 @@ const IndexPage: React.FunctionComponent = () => {
 	const [variables, setVariables] = useState(2);
 	const [restricciones, setRestricciones] = useState(2);
 	const [resultado, setResultado] = useState<resultado>();
+	const [ecuaciones, setEcuaciones] = useState<Array<string>>();
 
 	const calcular = (data: formData) => {
 		console.log(data);
@@ -58,7 +59,7 @@ const IndexPage: React.FunctionComponent = () => {
 		let m: number[][] = [];
 		for (let i = 0; i < rowHeaders.length - 1; i++) {
 			let row = [];
-			console.log('row', i + 1);
+
 			//Add values
 			for (let j = 0; j < variables; j++) {
 				row.push(Number(data[`row-${i}-val-${j}`]));
@@ -69,7 +70,7 @@ const IndexPage: React.FunctionComponent = () => {
 				let alignment = rowHeaders[i] === columnHeaders[j + offset];
 				row.push(alignment ? 1 : 0);
 			}
-			console.log(row);
+
 			// Add e
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s;
@@ -78,7 +79,7 @@ const IndexPage: React.FunctionComponent = () => {
 
 				row.push(alignment ? -1 : 0);
 			}
-			console.log(row);
+
 			// Fill r squares
 			for (let j = 0; j < r; j++) {
 				let offset = variables + s + r;
@@ -86,7 +87,7 @@ const IndexPage: React.FunctionComponent = () => {
 				row.push(alignment ? 1 : 0);
 			}
 			row.push(Number(data[`row-${i}-result`]));
-			console.log(row);
+
 			m.push(row);
 		}
 
@@ -96,13 +97,14 @@ const IndexPage: React.FunctionComponent = () => {
 			...[...Array(variables)].map((_, i) => Number(data[`fn-val-${i}`]) * -1),
 			...[...Array(s)].map((_) => 0),
 			...[...Array(r)].map((_) => 0),
+			...[...Array(r)].map((_) => 0),
 			0,
 		];
 
 		m.push(rowZ);
 
-		console.log(m, data['fn-type']);
-		console.log(m, columnHeaders, rowHeaders);
+		// console.log(m, data['fn-type']);
+		// console.log(m, columnHeaders, rowHeaders);
 
 		let result = simplexMethod({
 			matrix: m,
@@ -111,9 +113,56 @@ const IndexPage: React.FunctionComponent = () => {
 			fnZ: data['fn-type'],
 		});
 
-		console.log(result);
+		//Those not included are 0
+		for (let header of columnHeaders.slice(0, -1)) {
+			if (!(header in result)) {
+				result[header] = 0;
+			}
+		}
+
+		// console.log(result);
 
 		setResultado(result);
+
+		// CODIGO PARA SACAR LAS ECUACIONES
+
+		let ecuaciones = [];
+
+		for (let i = 0; i < rowHeaders.length; i++) {
+			let ecuacion = [];
+			for (let j = 0; j < columnHeaders.length; j++) {
+				let columnHeader = columnHeaders[j];
+				let coeficient = Number(m[i][j]);
+
+				if (columnHeader == 'res') {
+					columnHeader = '';
+				}
+
+				if (coeficient !== 0) {
+					if (coeficient == 1) {
+						ecuacion.push(`${columnHeader}`);
+					} else if (coeficient == -1) {
+						ecuacion.push(`-${columnHeader}`);
+					} else {
+						ecuacion.push(`${coeficient}${columnHeader}`);
+					}
+				} else {
+					if (columnHeaders[j] == 'res') {
+						ecuacion.push(coeficient);
+					}
+				}
+			}
+
+			ecuaciones.push(ecuacion.join('+').replace(/\+(?=[\d]+$)/, '='));
+		}
+
+		// SUSTITUIR LA ULTIMA ECUACIÓN POR LA Z
+
+		let ecuacionZ = ecuaciones[ecuaciones.length - 1];
+		ecuacionZ = 'Z' + ecuacionZ;
+		ecuaciones[ecuaciones.length - 1] = ecuacionZ;
+
+		setEcuaciones(ecuaciones);
 	};
 
 	return (
@@ -231,17 +280,23 @@ const IndexPage: React.FunctionComponent = () => {
 				css={css`
 					margin: 1rem;
 				`}>
-				{resultado ? (
+				{ecuaciones && (
+					<>
+						<h2>Forma canonica:</h2>{' '}
+						{ecuaciones.map((ecuacion) => (
+							<div key={ecuacion}>{ecuacion}</div>
+						))}
+					</>
+				)}
+				{resultado && (
 					<>
 						<h2>Resultados:</h2>{' '}
-						{Object.keys(resultado).map((key) => (
-							<div>
+						{Object.keys(resultado).map((key, i) => (
+							<div key={`${key}-${i}`}>
 								{key} : {resultado[key]}
 							</div>
 						))}
 					</>
-				) : (
-					'Sin resultado aun...'
 				)}
 			</section>
 		</Layout>
